@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Plus, Search, Filter, Calendar, Users, Clock, CheckCircle2, MoreHorizontal, Edit, Trash2 } from 'lucide-react';
+import { Plus, Search, Filter, Calendar, Users, Clock, CheckCircle2, MoreHorizontal, Edit, Trash2, FolderOpen } from 'lucide-react';
 import { useData } from '../../contexts/DataContext';
 import ProjectModal from './ProjectModal';
 import TaskModal from './TaskModal';
