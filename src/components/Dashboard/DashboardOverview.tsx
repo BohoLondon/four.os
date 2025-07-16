@@ -13,7 +13,7 @@ const DashboardOverview: React.FC = () => {
     return sum + invoice.amount;
   }, 0);
   const thisMonthContent = contentItems.filter(item => {
-    const itemDate = new Date(item.deadline);
+    const itemDate = new Date(item.deadline || item.scheduledDate || new Date());
     const now = new Date();
     return itemDate.getMonth() === now.getMonth() && itemDate.getFullYear() === now.getFullYear();
   }).length;
@@ -30,17 +30,17 @@ const DashboardOverview: React.FC = () => {
     { action: 'Project updated', client: projects[0]?.client || 'Unknown', time: '2 hours ago', type: 'project' },
     { action: 'Invoice paid', client: paidInvoices[0]?.client || 'Unknown', time: '4 hours ago', type: 'payment' },
     { action: 'New client added', client: clients[clients.length - 1]?.name || 'Unknown', time: '6 hours ago', type: 'client' },
-    { action: 'Content published', client: contentItems.find(c => c.status === 'Published')?.title || 'Unknown', time: '1 day ago', type: 'content' },
+    { action: 'Content published', client: contentItems.find(c => c.status === 'Published')?.title || 'Content Item', time: '1 day ago', type: 'content' },
   ];
 
   const todayQuote = "Design is not just what it looks like and feels like. Design is how it works.";
 
   // Get urgent items
   const urgentProjects = projects.filter(p => {
-    const deadline = new Date(p.deadline);
+    const deadline = new Date(p.dueDate);
     const now = new Date();
     const daysUntilDeadline = Math.ceil((deadline.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
-    return daysUntilDeadline <= 7 && p.status !== 'Complete';
+    return daysUntilDeadline <= 7 && p.status !== 'Complete' && p.status !== 'Live';
   });
 
   const overdueInvoices = invoices.filter(i => i.status === 'Overdue');
@@ -77,7 +77,7 @@ const DashboardOverview: React.FC = () => {
                   Project "{project.name}" deadline approaching
                 </span>
                 <span className="text-xs text-red-600 dark:text-red-400">
-                  Due: {new Date(project.deadline).toLocaleDateString()}
+                  Due: {new Date(project.dueDate).toLocaleDateString()}
                 </span>
               </div>
             ))}
@@ -87,7 +87,7 @@ const DashboardOverview: React.FC = () => {
                   Invoice {invoice.id} is overdue
                 </span>
                 <span className="text-xs text-red-600 dark:text-red-400">
-                  {invoice.amount}
+                  ${invoice.amount.toLocaleString()}
                 </span>
               </div>
             ))}

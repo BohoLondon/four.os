@@ -1,50 +1,47 @@
 import React, { useState } from 'react';
-import { Calendar, Plus, Video, Image, FileText, Users, Clock, Eye } from 'lucide-react';
+import { Calendar, Plus, Video, Image, FileText, Users, Clock, Eye, Edit, Trash2, MoreHorizontal, Play, Share, CheckCircle } from 'lucide-react';
+import { useData } from '../../contexts/DataContext';
+import ContentModal from './ContentModal';
 
 const ContentView: React.FC = () => {
+  const { contentItems, deleteContentItem, updateContentItem } = useData();
   const [currentView, setCurrentView] = useState<'calendar' | 'content'>('calendar');
+  const [isContentModalOpen, setIsContentModalOpen] = useState(false);
+  const [selectedContent, setSelectedContent] = useState<string | null>(null);
+  const [showContentActions, setShowContentActions] = useState<string | null>(null);
 
-  const contentItems = [
-    {
-      id: 1,
-      title: 'Maison Luxe Campaign Video',
-      type: 'Video',
-      status: 'In Production',
-      assignee: 'Sarah Chen',
-      deadline: '2024-01-20',
-      views: 1250,
-      thumbnail: 'https://images.pexels.com/photos/1667071/pexels-photo-1667071.jpeg?auto=compress&cs=tinysrgb&w=400'
-    },
-    {
-      id: 2,
-      title: 'Studio Noir Social Posts',
-      type: 'Social Media',
-      status: 'Review',
-      assignee: 'Alex Morgan',
-      deadline: '2024-01-18',
-      views: 890,
-      thumbnail: 'https://images.pexels.com/photos/1040945/pexels-photo-1040945.jpeg?auto=compress&cs=tinysrgb&w=400'
-    },
-    {
-      id: 3,
-      title: 'Atelier Modern Editorial',
-      type: 'Editorial',
+  const handleDeleteContent = (contentId: string) => {
+    deleteContentItem(contentId);
+    setShowContentActions(null);
+  };
+
+  const handlePublishContent = (contentId: string) => {
+    updateContentItem(contentId, { 
       status: 'Published',
-      assignee: 'Jordan Kim',
-      deadline: '2024-01-15',
-      views: 2140,
-      thumbnail: 'https://images.pexels.com/photos/1438832/pexels-photo-1438832.jpeg?auto=compress&cs=tinysrgb&w=400'
-    }
-  ];
+      publishedDate: new Date().toISOString()
+    });
+    setShowContentActions(null);
+  };
+
+  const handleApproveContent = (contentId: string) => {
+    updateContentItem(contentId, { status: 'Approved' });
+    setShowContentActions(null);
+  };
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'In Production':
+      case 'Published':
+        return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300';
+      case 'Approved':
         return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300';
       case 'Review':
         return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300';
-      case 'Published':
-        return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300';
+      case 'Draft':
+        return 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300';
+      case 'Idea':
+        return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300';
+      case 'Archived':
+        return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300';
       default:
         return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300';
     }
@@ -54,9 +51,9 @@ const ContentView: React.FC = () => {
     switch (type) {
       case 'Video':
         return Video;
-      case 'Social Media':
+      case 'Post':
         return Image;
-      case 'Editorial':
+      case 'Email':
         return FileText;
       default:
         return FileText;
@@ -94,7 +91,13 @@ const ContentView: React.FC = () => {
               Content
             </button>
           </div>
-          <button className="flex items-center space-x-2 bg-gray-900 dark:bg-white text-white dark:text-gray-900 px-4 py-2 rounded-xl hover:bg-gray-800 dark:hover:bg-gray-100 transition-colors">
+          <button 
+            onClick={() => {
+              setSelectedContent(null);
+              setIsContentModalOpen(true);
+            }}
+            className="flex items-center space-x-2 bg-gray-900 dark:bg-white text-white dark:text-gray-900 px-4 py-2 rounded-xl hover:bg-gray-800 dark:hover:bg-gray-100 transition-colors"
+          >
             <Plus className="w-4 h-4" />
             <span>New Content</span>
           </button>
@@ -128,7 +131,7 @@ const ContentView: React.FC = () => {
             {Array.from({ length: 35 }, (_, i) => {
               const date = i - 6; // Start from last week of previous month
               const isCurrentMonth = date > 0 && date <= 31;
-              const hasContent = [15, 18, 20, 25].includes(date);
+              const hasContent = contentItems.some(item => new Date(item.deadline).getDate() === date);
               
               return (
                 <div
@@ -164,7 +167,7 @@ const ContentView: React.FC = () => {
                     <img 
                       src={item.thumbnail} 
                       alt={item.title}
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-cover rounded-lg"
                     />
                   </div>
                   
@@ -181,6 +184,10 @@ const ContentView: React.FC = () => {
                     
                     <div className="flex items-center space-x-4 text-sm text-gray-500 dark:text-gray-400">
                       <div className="flex items-center space-x-1">
+                        <span>Platforms:</span>
+                        <span>{item.platform.join(', ')}</span>
+                      </div>
+                      <div className="flex items-center space-x-1">
                         <Users className="w-4 h-4" />
                         <span>{item.assignee}</span>
                       </div>
@@ -190,18 +197,75 @@ const ContentView: React.FC = () => {
                       </div>
                       <div className="flex items-center space-x-1">
                         <Eye className="w-4 h-4" />
-                        <span>{item.views.toLocaleString()}</span>
+                        <span>{item.analytics.views.toLocaleString()}</span>
                       </div>
                     </div>
+                    
+                    {item.script.content && (
+                      <div className="mt-2">
+                        <p className="text-sm text-gray-600 dark:text-gray-300 line-clamp-2">
+                          {item.script.content}
+                        </p>
+                      </div>
+                    )}
                   </div>
                   
-                  <div className="flex items-center space-x-2">
-                    <button className="px-3 py-1 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
-                      Edit
+                  <div className="flex items-center space-x-2 relative">
+                    {item.type === 'Video' && (
+                      <button className="p-2 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
+                        <Play className="w-4 h-4" />
+                      </button>
+                    )}
+                    <button className="p-2 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
+                      <Share className="w-4 h-4" />
                     </button>
-                    <button className="px-3 py-1 bg-gray-900 dark:bg-white text-white dark:text-gray-900 rounded-lg hover:bg-gray-800 dark:hover:bg-gray-100 transition-colors">
-                      View
+                    <button
+                      onClick={() => setShowContentActions(showContentActions === item.id ? null : item.id)}
+                      className="p-2 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+                    >
+                      <MoreHorizontal className="w-4 h-4" />
                     </button>
+                    
+                    {showContentActions === item.id && (
+                      <div className="absolute right-0 top-full mt-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-10 min-w-48">
+                        <button
+                          onClick={() => {
+                            setSelectedContent(item.id);
+                            setIsContentModalOpen(true);
+                            setShowContentActions(null);
+                          }}
+                          className="w-full text-left px-4 py-2 hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center space-x-2"
+                        >
+                          <Edit className="w-4 h-4" />
+                          <span>Edit</span>
+                        </button>
+                        {item.status === 'Review' && (
+                          <button
+                            onClick={() => handleApproveContent(item.id)}
+                            className="w-full text-left px-4 py-2 hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center space-x-2 text-green-600 dark:text-green-400"
+                          >
+                            <CheckCircle className="w-4 h-4" />
+                            <span>Approve</span>
+                          </button>
+                        )}
+                        {(item.status === 'Approved' || item.status === 'Draft') && (
+                          <button
+                            onClick={() => handlePublishContent(item.id)}
+                            className="w-full text-left px-4 py-2 hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center space-x-2 text-blue-600 dark:text-blue-400"
+                          >
+                            <Calendar className="w-4 h-4" />
+                            <span>Publish</span>
+                          </button>
+                        )}
+                        <button
+                          onClick={() => handleDeleteContent(item.id)}
+                          className="w-full text-left px-4 py-2 hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center space-x-2 text-red-600 dark:text-red-400"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                          <span>Delete</span>
+                        </button>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
@@ -209,6 +273,16 @@ const ContentView: React.FC = () => {
           })}
         </div>
       )}
+
+      {/* Content Modal */}
+      <ContentModal
+        isOpen={isContentModalOpen}
+        onClose={() => {
+          setIsContentModalOpen(false);
+          setSelectedContent(null);
+        }}
+        contentId={selectedContent}
+      />
     </div>
   );
 };

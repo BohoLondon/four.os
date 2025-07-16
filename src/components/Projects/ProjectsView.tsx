@@ -111,7 +111,7 @@ const ProjectsView: React.FC = () => {
                 <div className="flex items-center space-x-2">
                   <span className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(project.status)}`}>
                     {project.status}
-                  </span>
+                    {new Date(project.dueDate).toLocaleDateString()}
                   <div className="relative">
                     <button 
                       className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors"
@@ -206,7 +206,7 @@ const ProjectsView: React.FC = () => {
                       <span>{isExpanded ? '▼' : '▶'}</span>
                     </button>
                     
-                    {isExpanded && (
+                  <span className="text-sm text-gray-500 dark:text-gray-400">{project.creativeLead}</span>
                       <div className="mt-2 space-y-1">
                         {project.tasks.slice(0, 3).map(task => (
                           <div key={task.id} className="flex items-center space-x-2 text-xs">

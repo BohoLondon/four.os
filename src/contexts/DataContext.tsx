@@ -165,6 +165,7 @@ export interface ContentItem {
   cta: string;
   assignee: string;
   projectId?: string;
+  deadline: string;
   analytics: {
     views: number;
     engagement: number;
@@ -530,6 +531,7 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       cta: 'Shop Now',
       assignee: 'Jordan Kim',
       projectId: '1',
+      deadline: '2024-01-20',
       analytics: {
         views: 0,
         engagement: 0,

@@ -185,37 +185,42 @@ const ProjectModal: React.FC<ProjectModalProps> = ({ isOpen, onClose, projectId 
                 onChange={handleChange}
                 className="w-full px-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-gray-900 dark:focus:ring-white/20"
               >
-                <option value="Planning">Planning</option>
-                <option value="In Progress">In Progress</option>
-                <option value="Review">Review</option>
-                <option value="Complete">Complete</option>
-                <option value="On Hold">On Hold</option>
+                <option value="Concept">Concept</option>
+                <option value="Strategy">Strategy</option>
+                <option value="Design">Design</option>
+                <option value="Production">Production</option>
+                <option value="Handoff">Handoff</option>
+                <option value="Live">Live</option>
+                <option value="Archived">Archived</option>
               </select>
             </div>
 
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Progress (%)
+                Phase
               </label>
-              <input
-                type="number"
-                name="progress"
-                value={formData.progress}
+              <select
+                name="phase"
+                value={formData.phase}
                 onChange={handleChange}
-                min="0"
-                max="100"
                 className="w-full px-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-gray-900 dark:focus:ring-white/20"
-              />
+              >
+                <option value="Brief">Brief</option>
+                <option value="Strategy">Strategy</option>
+                <option value="Design">Design</option>
+                <option value="Production">Production</option>
+                <option value="Handoff">Handoff</option>
+              </select>
             </div>
 
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Deadline
+                Start Date
               </label>
               <input
                 type="date"
-                name="deadline"
-                value={formData.deadline}
+                name="startDate"
+                value={formData.startDate}
                 onChange={handleChange}
                 className="w-full px-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-gray-900 dark:focus:ring-white/20"
               />
@@ -223,15 +228,28 @@ const ProjectModal: React.FC<ProjectModalProps> = ({ isOpen, onClose, projectId 
 
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Team Size
+                Due Date
               </label>
               <input
-                type="number"
-                name="team"
-                value={formData.team}
+                type="date"
+                name="dueDate"
+                value={formData.dueDate}
                 onChange={handleChange}
-                min="1"
                 className="w-full px-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-gray-900 dark:focus:ring-white/20"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Creative Lead
+              </label>
+              <input
+                type="text"
+                name="creativeLead"
+                value={formData.creativeLead}
+                onChange={handleChange}
+                className="w-full px-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-gray-900 dark:focus:ring-white/20"
+                placeholder="Lead team member"
               />
             </div>
 
@@ -251,7 +269,7 @@ const ProjectModal: React.FC<ProjectModalProps> = ({ isOpen, onClose, projectId 
               />
             </div>
 
-            <div>
+            <div className="md:col-span-2">
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Project Color
               </label>
