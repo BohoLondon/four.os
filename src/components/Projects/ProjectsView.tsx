@@ -190,7 +190,9 @@ const ProjectsView: React.FC = () => {
 
                 <div className="flex items-center justify-between pt-2 border-t border-gray-200 dark:border-gray-700">
                   <span className="text-sm text-gray-500 dark:text-gray-400">Budget</span>
-                  <span className="text-sm font-medium text-gray-900 dark:text-white">{project.budget}</span>
+                  <span className="text-sm font-medium text-gray-900 dark:text-white">
+                    {typeof project.budget === 'object' ? `$${project.budget.estimated?.toLocaleString() || '0'}` : project.budget}
+                  </span>
                 </div>
 
                 {/* Tasks Preview */}

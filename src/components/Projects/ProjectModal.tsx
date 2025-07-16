@@ -17,7 +17,11 @@ const ProjectModal: React.FC<ProjectModalProps> = ({ isOpen, onClose, projectId 
     progress: 0,
     deadline: '',
     team: 1,
-    budget: '',
+    budget: {
+      estimated: 0,
+      actual: 0,
+      breakdown: {}
+    },
     color: 'bg-blue-500',
     description: ''
   });
@@ -45,7 +49,11 @@ const ProjectModal: React.FC<ProjectModalProps> = ({ isOpen, onClose, projectId 
         progress: project.progress,
         deadline: project.deadline,
         team: project.team,
-        budget: project.budget,
+        budget: typeof project.budget === 'object' ? project.budget : {
+          estimated: parseFloat(project.budget?.toString().replace(/[$,]/g, '') || '0') || 0,
+          actual: 0,
+          breakdown: {}
+        },
         color: project.color,
         description: project.description
       });
@@ -57,7 +65,11 @@ const ProjectModal: React.FC<ProjectModalProps> = ({ isOpen, onClose, projectId 
         progress: 0,
         deadline: '',
         team: 1,
-        budget: '',
+        budget: {
+          estimated: 0,
+          actual: 0,
+          breakdown: {}
+        },
         color: 'bg-blue-500',
         description: ''
       });
@@ -86,11 +98,24 @@ const ProjectModal: React.FC<ProjectModalProps> = ({ isOpen, onClose, projectId 
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
-    const value = e.target.type === 'number' ? parseInt(e.target.value) || 0 : e.target.value;
-    setFormData(prev => ({
-      ...prev,
-      [e.target.name]: value
-    }));
+    const { name, value, type } = e.target;
+    
+    if (name === 'budget.estimated') {
+      const numericValue = parseFloat(value) || 0;
+      setFormData(prev => ({
+        ...prev,
+        budget: {
+          ...prev.budget,
+          estimated: numericValue
+        }
+      }));
+    } else {
+      const processedValue = type === 'number' ? parseInt(value) || 0 : value;
+      setFormData(prev => ({
+        ...prev,
+        [name]: processedValue
+      }));
+    }
   };
 
   if (!isOpen) return null;
@@ -212,15 +237,17 @@ const ProjectModal: React.FC<ProjectModalProps> = ({ isOpen, onClose, projectId 
 
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Budget
+                Budget (Estimated)
               </label>
               <input
-                type="text"
-                name="budget"
-                value={formData.budget}
+                type="number"
+                name="budget.estimated"
+                value={formData.budget.estimated}
                 onChange={handleChange}
+                min="0"
+                step="0.01"
                 className="w-full px-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-gray-900 dark:focus:ring-white/20"
-                placeholder="$25,000"
+                placeholder="25000"
               />
             </div>
 
