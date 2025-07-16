@@ -76,3 +76,5 @@ const CreateFolderModal: React.FC<CreateFolderModalProps> = ({ isOpen, onClose, 
     </div>
   );
 };
+
+export default CreateFolderModal
