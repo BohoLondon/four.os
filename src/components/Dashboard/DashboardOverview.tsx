@@ -10,7 +10,7 @@ const DashboardOverview: React.FC = () => {
   const totalClients = clients.length;
   const paidInvoices = invoices.filter(i => i.status === 'Paid');
   const monthlyRevenue = paidInvoices.reduce((sum, invoice) => {
-    return sum + parseFloat(invoice.amount.replace('$', '').replace(',', ''));
+    return sum + invoice.amount;
   }, 0);
   const thisMonthContent = contentItems.filter(item => {
     const itemDate = new Date(item.deadline);
