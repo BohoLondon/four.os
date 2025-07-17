@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Plus, Search, Filter, MoreHorizontal, Mail, Phone, MapPin, Edit, Trash2, Eye, Clock, Globe, MessageSquare, AlertTriangle, CheckCircle, User, FileText, DollarSign } from 'lucide-react';
+import { Plus, Search, Filter, MoreHorizontal, Mail, Phone, MapPin, Edit, Trash2, Eye, Clock, Globe, MessageSquare, AlertTriangle, CheckCircle, User, FileText, DollarSign, X } from 'lucide-react';
 import { useData } from '../../contexts/DataContext';
 import ClientModal from './ClientModal';
 import ClientDetailModal from './ClientDetailModal';
@@ -12,6 +12,7 @@ const ClientsView: React.FC = () => {
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [selectedClient, setSelectedClient] = useState<string | null>(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState<string | null>(null);
+  const [showContactModal, setShowContactModal] = useState<string | null>(null);
 
   // Filter clients based on search and status
   const filteredClients = clients.filter(client => {
@@ -27,6 +28,10 @@ const ClientsView: React.FC = () => {
   const handleDeleteClient = (clientId: string) => {
     deleteClient(clientId);
     setShowDeleteConfirm(null);
+  };
+
+  const handleContactClient = (client: any) => {
+    setShowContactModal(client.id);
   };
 
   const getClientStats = (clientId: string) => {
@@ -312,7 +317,10 @@ const ClientsView: React.FC = () => {
 
               {/* Actions */}
               <div className="flex items-center space-x-2">
-                <button className="flex-1 flex items-center justify-center space-x-2 py-2 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
+                <button 
+                  onClick={() => handleContactClient(client)}
+                  className="flex-1 flex items-center justify-center space-x-2 py-2 bg-white dark:bg-white text-gray-900 dark:text-gray-900 border border-gray-200 dark:border-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-100 transition-colors"
+                >
                   <Mail className="w-4 h-4" />
                   <span className="text-sm">Contact</span>
                 </button>
@@ -371,6 +379,121 @@ const ClientsView: React.FC = () => {
         }}
         clientId={selectedClient}
       />
+
+      {/* Contact Modal */}
+      {showContactModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 w-full max-w-md">
+            {(() => {
+              const client = clients.find(c => c.id === showContactModal);
+              if (!client) return null;
+              
+              return (
+                <>
+                  <div className="flex items-center justify-between mb-6">
+                    <div className="flex items-center space-x-3">
+                      <img
+                        src={client.avatar}
+                        alt={client.name}
+                        className="w-12 h-12 rounded-full object-cover"
+                      />
+                      <div>
+                        <h2 className="text-xl font-semibold text-gray-900 dark:text-white">{client.name}</h2>
+                        <p className="text-gray-500 dark:text-gray-400">{client.industry}</p>
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => setShowContactModal(null)}
+                      className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                    >
+                      <X className="w-5 h-5 text-gray-500 dark:text-gray-400" />
+                    </button>
+                  </div>
+
+                  <div className="space-y-4">
+                    <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-xl">
+                      <div className="flex items-center space-x-3 mb-3">
+                        <Mail className="w-5 h-5 text-gray-500 dark:text-gray-400" />
+                        <div>
+                          <p className="text-sm font-medium text-gray-900 dark:text-white">Email</p>
+                          <p className="text-sm text-gray-600 dark:text-gray-300">{client.contactInfo.email}</p>
+                        </div>
+                      </div>
+                      <div className="flex space-x-2">
+                        <a
+                          href={`mailto:${client.contactInfo.email}`}
+                          className="flex-1 bg-gray-900 dark:bg-white text-white dark:text-gray-900 px-4 py-2 rounded-lg hover:bg-gray-800 dark:hover:bg-gray-100 transition-colors text-center text-sm"
+                        >
+                          Send Email
+                        </a>
+                        <button
+                          onClick={() => navigator.clipboard.writeText(client.contactInfo.email)}
+                          className="px-4 py-2 bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-500 transition-colors text-sm"
+                        >
+                          Copy
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-xl">
+                      <div className="flex items-center space-x-3 mb-3">
+                        <Phone className="w-5 h-5 text-gray-500 dark:text-gray-400" />
+                        <div>
+                          <p className="text-sm font-medium text-gray-900 dark:text-white">Phone</p>
+                          <p className="text-sm text-gray-600 dark:text-gray-300">{client.contactInfo.phone}</p>
+                        </div>
+                      </div>
+                      <div className="flex space-x-2">
+                        <a
+                          href={`tel:${client.contactInfo.phone}`}
+                          className="flex-1 bg-gray-900 dark:bg-white text-white dark:text-gray-900 px-4 py-2 rounded-lg hover:bg-gray-800 dark:hover:bg-gray-100 transition-colors text-center text-sm"
+                        >
+                          Call Now
+                        </a>
+                        <button
+                          onClick={() => navigator.clipboard.writeText(client.contactInfo.phone)}
+                          className="px-4 py-2 bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-500 transition-colors text-sm"
+                        >
+                          Copy
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-xl">
+                      <div className="flex items-center space-x-3 mb-3">
+                        <MapPin className="w-5 h-5 text-gray-500 dark:text-gray-400" />
+                        <div>
+                          <p className="text-sm font-medium text-gray-900 dark:text-white">Address</p>
+                          <p className="text-sm text-gray-600 dark:text-gray-300">{client.contactInfo.address}</p>
+                        </div>
+                      </div>
+                      <button
+                        onClick={() => navigator.clipboard.writeText(client.contactInfo.address)}
+                        className="w-full bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-300 px-4 py-2 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-500 transition-colors text-sm"
+                      >
+                        Copy Address
+                      </button>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="p-3 bg-gray-50 dark:bg-gray-700 rounded-lg text-center">
+                        <Globe className="w-5 h-5 text-gray-500 dark:text-gray-400 mx-auto mb-1" />
+                        <p className="text-xs text-gray-500 dark:text-gray-400">Timezone</p>
+                        <p className="text-sm font-medium text-gray-900 dark:text-white">{client.contactInfo.timezone}</p>
+                      </div>
+                      <div className="p-3 bg-gray-50 dark:bg-gray-700 rounded-lg text-center">
+                        <MessageSquare className="w-5 h-5 text-gray-500 dark:text-gray-400 mx-auto mb-1" />
+                        <p className="text-xs text-gray-500 dark:text-gray-400">Preferred</p>
+                        <p className="text-sm font-medium text-gray-900 dark:text-white">{client.contactInfo.preferredCommunication}</p>
+                      </div>
+                    </div>
+                  </div>
+                </>
+              );
+            })()}
+          </div>
+        </div>
+      )}
     </div>
   );
 };

@@ -77,6 +77,7 @@ const ClientModal: React.FC<ClientModalProps> = ({ isOpen, onClose, clientId }) 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
+    const selectedClient = clients.find(c => c.id === formData.clientId);
     if (isEditing && clientId) {
       updateClient(clientId, formData);
     } else {
