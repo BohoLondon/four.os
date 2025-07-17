@@ -258,7 +258,7 @@ const FinanceView: React.FC = () => {
                   </p>
                 ))}
               </div>
-            </p>
+            </div>
           </div>
         </div>
       )}
