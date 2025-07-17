@@ -273,7 +273,6 @@ const FinanceView: React.FC = () => {
         invoiceId={selectedInvoice}
       />
       </div>
-    </div>
   );
 };
 
