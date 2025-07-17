@@ -11,13 +11,14 @@ import SettingsView from '../Settings/SettingsView';
 
 interface DashboardProps {
   currentView: string;
+  onViewChange?: (view: string) => void;
 }
 
-const Dashboard: React.FC<DashboardProps> = ({ currentView }) => {
+const Dashboard: React.FC<DashboardProps> = ({ currentView, onViewChange }) => {
   const renderView = () => {
     switch (currentView) {
       case 'dashboard':
-        return <DashboardOverview />;
+        return <DashboardOverview onNavigate={onViewChange} />;
       case 'clients':
         return <ClientsView />;
       case 'projects':
